@@ -13,27 +13,28 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
+      - name: Set up SSH key
+        uses: webfactory/ssh-agent@v0.5.5
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
-      - name: Check if Docker container exists
-        id: check_container
+      - name: Check if container exists
         run: |
-          CONTAINER_EXISTS=$(sshpass -p '${{ secrets.SERVER_PASSWORD }}' ssh root@${{ secrets.SERVER_IP }} 'docker ps -aqf "name=canchamanager-app"')
+          CONTAINER_EXISTS=$(ssh root@${{ secrets.SERVER_IP }} 'docker ps -aqf "name=canchamanager-app"')
           echo "::set-output name=exists::${CONTAINER_EXISTS}"
 
-      - name: Remove existing Docker container if it exists
-        if: steps.check_container.outputs.exists != ''
+      - name: Stop and remove existing Docker container
         run: |
-          sshpass -p '${{ secrets.SERVER_PASSWORD }}' ssh root@${{ secrets.SERVER_IP }} 'docker stop canchamanager-app && docker rm canchamanager-app'
+          ssh root@${{ secrets.SERVER_IP }} 'docker stop canchamanager-app || true'
+          ssh root@${{ secrets.SERVER_IP }} 'docker rm canchamanager-app || true'
 
       - name: Remove existing Docker image
         run: |
-          sshpass -p '${{ secrets.SERVER_PASSWORD }}' ssh root@${{ secrets.SERVER_IP }} 'docker rmi canchamanager-app:latest || true'
+          ssh root@${{ secrets.SERVER_IP }} 'docker rmi canchamanager-app:latest || true'
 
       - name: Send Docker image to Linux Server
-        run: docker save canchamanager-app:latest | sshpass -p '${{ secrets.SERVER_PASSWORD }}' ssh root@${{ secrets.SERVER_IP }} 'docker load'
+        run: docker save canchamanager-app:latest | ssh root@${{ secrets.SERVER_IP }} 'docker load'
 
-      - name: SSH into Linux Server and restart Docker container
+      - name: Restart Docker container
         run: |
-          sshpass -p '${{ secrets.SERVER_PASSWORD }}' ssh root@${{ secrets.SERVER_IP }} 'docker run -d --name canchamanager-app -p 8080:8080 canchamanager-app:latest'
+          ssh root@${{ secrets.SERVER_IP }} 'docker run -d --name canchamanager-app -p 8080:8080 canchamanager-app:latest'

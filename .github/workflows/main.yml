@@ -14,38 +14,44 @@ jobs:
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H innovatecode.net >> ~/.ssh/known_hosts
-          ssh -o StrictHostKeyChecking=no root@innovatecode.net echo "SSH Key configured successfully"
+          ssh-keyscan -H ${{ secrets.SERVER_IP }} >> ~/.ssh/known_hosts
+          ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_IP }} echo "SSH Key configured successfully"
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          SERVER_IP: ${{ secrets.SERVER_IP }}
 
       - name: Check if container exists
         run: |
-          CONTAINER_EXISTS=$(ssh -o StrictHostKeyChecking=no root@innovatecode.net 'docker ps -aqf "name=canchamanager-app"')
+          CONTAINER_EXISTS=$(ssh -v root@${{ secrets.SERVER_IP }} 'docker ps -aqf "name=canchamanager-app"')
           echo "::set-output name=exists::${CONTAINER_EXISTS}"
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          SERVER_IP: ${{ secrets.SERVER_IP }}
 
       - name: Stop and remove existing Docker container
         run: |
-          ssh -o StrictHostKeyChecking=no root@innovatecode.net 'docker stop canchamanager-app || true'
-          ssh -o StrictHostKeyChecking=no root@innovatecode.net 'docker rm canchamanager-app || true'
+          ssh -v root@${{ secrets.SERVER_IP }} 'docker stop canchamanager-app || true'
+          ssh -v root@${{ secrets.SERVER_IP }} 'docker rm canchamanager-app || true'
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          SERVER_IP: ${{ secrets.SERVER_IP }}
 
       - name: Remove existing Docker image
         run: |
-          ssh -o StrictHostKeyChecking=no root@innovatecode.net 'docker rmi canchamanager-app:latest || true'
+          ssh -v root@${{ secrets.SERVER_IP }} 'docker rmi canchamanager-app:latest || true'
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          SERVER_IP: ${{ secrets.SERVER_IP }}
 
       - name: Send Docker image to Linux Server
-        run: docker save canchamanager-app:latest | ssh -o StrictHostKeyChecking=no root@innovatecode.net 'docker load'
+        run: docker save canchamanager-app:latest | ssh -v root@${{ secrets.SERVER_IP }} 'docker load'
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          SERVER_IP: ${{ secrets.SERVER_IP }}
 
       - name: Restart Docker container
         run: |
-          ssh -o StrictHostKeyChecking=no root@innovatecode.net 'docker run -d --name canchamanager-app -p 8080:8080 canchamanager-app:latest'
+          ssh -v root@${{ secrets.SERVER_IP }} 'docker run -d --name canchamanager-app -p 8080:8080 canchamanager-app:latest'
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          SERVER_IP: ${{ secrets.SERVER_IP }}

@@ -1,0 +1,45 @@
+name: Docker Build and Deploy
+
+on:
+  push:
+    branches:
+      - main  # Cambia 'main' por el nombre de tu rama principal si es diferente
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Build Docker image
+        run: |
+          docker build -t canchamanager-app .
+          docker tag canchamanager-app:latest ${{ secrets.SERVER_IP }}/canchamanager-app:latest
+        env:
+          DOCKER_BUILDKIT: 1
+
+      - name: Install SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "root:${{ secrets.SERVER_PASSWORD }}" > ~/.ssh/password
+          chmod 600 ~/.ssh/password
+
+      - name: Remove existing Docker container
+        run: |
+          sshpass -f ~/.ssh/password ssh root@${{ secrets.SERVER_IP }} 'docker stop canchamanager-app || true && docker rm canchamanager-app || true'
+
+      - name: Remove existing Docker image
+        run: |
+          sshpass -f ~/.ssh/password ssh root@${{ secrets.SERVER_IP }} 'docker rmi canchamanager-app:latest || true'
+
+      - name: Send Docker image to Linux Server
+        run: docker save canchamanager-app:latest | sshpass -f ~/.ssh/password ssh root@${{ secrets.SERVER_IP }} 'docker load'
+
+      - name: SSH into Linux Server and restart Docker container
+        run: |
+          sshpass -f ~/.ssh/password ssh root@${{ secrets.SERVER_IP }} 'docker run -d --name canchamanager-app -p 8080:8080 canchamanager-app:latest'

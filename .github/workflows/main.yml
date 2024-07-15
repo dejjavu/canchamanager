@@ -3,7 +3,7 @@ name: Docker Build and Deploy
 on:
   push:
     branches:
-      - main  # Cambia 'main' por el nombre de tu rama principal si es diferente
+      - main
 
 jobs:
   deploy:
@@ -23,17 +23,25 @@ jobs:
         env:
           DOCKER_BUILDKIT: 1
 
-      - name: Remove existing Docker container
+      - name: Check if Docker container exists
+        id: check_container
         run: |
-          sshpass -p ${{ secrets.SERVER_PASSWORD }} ssh root@${{ secrets.SERVER_IP }} 'docker stop canchamanager-app || true && docker rm canchamanager-app || true'
+          CONTAINER_EXISTS=$(sshpass -p '${{ secrets.SERVER_PASSWORD }}' ssh root@${{ secrets.SERVER_IP }} 'docker ps -aqf "name=canchamanager-app"')
+          echo "::set-output name=exists::${CONTAINER_EXISTS}"
+        continue-on-error: true
+
+      - name: Remove existing Docker container if it exists
+        if: steps.check_container.outputs.exists != ''
+        run: |
+          sshpass -p '${{ secrets.SERVER_PASSWORD }}' ssh root@${{ secrets.SERVER_IP }} 'docker stop canchamanager-app && docker rm canchamanager-app'
 
       - name: Remove existing Docker image
         run: |
-          sshpass -p ${{ secrets.SERVER_PASSWORD }} ssh root@${{ secrets.SERVER_IP }} 'docker rmi canchamanager-app:latest || true'
+          sshpass -p '${{ secrets.SERVER_PASSWORD }}' ssh root@${{ secrets.SERVER_IP }} 'docker rmi canchamanager-app:latest || true'
 
       - name: Send Docker image to Linux Server
-        run: docker save canchamanager-app:latest | sshpass -p ${{ secrets.SERVER_PASSWORD }} ssh root@${{ secrets.SERVER_IP }} 'docker load'
+        run: docker save canchamanager-app:latest | sshpass -p '${{ secrets.SERVER_PASSWORD }}' ssh root@${{ secrets.SERVER_IP }} 'docker load'
 
       - name: SSH into Linux Server and restart Docker container
         run: |
-          sshpass -p ${{ secrets.SERVER_PASSWORD }} ssh root@${{ secrets.SERVER_IP }} 'docker run -d --name canchamanager-app -p 8080:8080 canchamanager-app:latest'
+          sshpass -p '${{ secrets.SERVER_PASSWORD }}' ssh root@${{ secrets.SERVER_IP }} 'docker run -d --name canchamanager-app -p 8080:8080 canchamanager-app:latest'

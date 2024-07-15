@@ -26,37 +26,20 @@ jobs:
       - name: Install SSH key
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H ${{ secrets.SERVER_IP }} >> ~/.ssh/known_hosts
+          echo "root:${{ secrets.SERVER_PASSWORD }}" > ~/.ssh/password
+          chmod 600 ~/.ssh/password
 
       - name: Remove existing Docker container
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.SERVER_IP }}
-          username: root
-          password: ${{ secrets.SERVER_PASSWORD }}
-          script: |
-            docker stop canchamanager-app || true
-            docker rm canchamanager-app || true
+        run: |
+          sshpass -f ~/.ssh/password ssh root@${{ secrets.SERVER_IP }} 'docker stop canchamanager-app || true && docker rm canchamanager-app || true'
 
       - name: Remove existing Docker image
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.SERVER_IP }}
-          username: root
-          password: ${{ secrets.SERVER_PASSWORD }}
-          script: |
-            docker rmi canchamanager-app:latest || true
+        run: |
+          sshpass -f ~/.ssh/password ssh root@${{ secrets.SERVER_IP }} 'docker rmi canchamanager-app:latest || true'
 
       - name: Send Docker image to Linux Server
-        run: docker save canchamanager-app:latest | ssh root@${{ secrets.SERVER_IP }} 'docker load'
+        run: docker save canchamanager-app:latest | sshpass -f ~/.ssh/password ssh root@${{ secrets.SERVER_IP }} 'docker load'
 
       - name: SSH into Linux Server and restart Docker container
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.SERVER_IP }}
-          username: root
-          password: ${{ secrets.SERVER_PASSWORD }}
-          script: |
-            docker run -d --name canchamanager-app -p 8080:8080 canchamanager-app:latest
+        run: |
+          sshpass -f ~/.ssh/password ssh root@${{ secrets.SERVER_IP }} 'docker run -d --name canchamanager-app -p 8080:8080 canchamanager-app:latest'

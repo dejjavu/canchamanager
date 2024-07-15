@@ -25,3 +25,5 @@ RUN ./mvnw clean install -DskipTests
 
 # Levantar nuestra aplicación cuando el contenedor inicie
 ENTRYPOINT ["java","-jar","./target/CanchaManager-0.0.1-SNAPSHOT.jar"]
+
+# Prueba

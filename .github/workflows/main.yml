@@ -13,6 +13,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
+      - name: Create SSH directory if it doesn't exist
+        run: mkdir -p ~/.ssh
+
       - name: Add SSH key to known_hosts
         run: ssh-keyscan -t rsa ${SERVER_IP} >> ~/.ssh/known_hosts
         env:

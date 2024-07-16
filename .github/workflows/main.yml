@@ -21,17 +21,50 @@ jobs:
       - name: Verify SSH connection
         run: ssh -o StrictHostKeyChecking=no root@${{ secrets.SERVER_IP }} echo "SSH connection successful"
 
-      - name: Build Docker image
-        run: docker build -t backend-cm:latest .
-        working-directory: ./  # Ajusta según la ubicación de tu Dockerfile dentro del repositorio
+      - name: SSH into remote server and stop container if running
+        run: |
+          ssh root@${{ secrets.SERVER_IP }} '
+            docker ps -a | grep backend-cm | awk '\''{print $1}'\'' | xargs docker stop || true
+          '
+        env:
+          SERVER_IP: ${{ secrets.SERVER_IP }}
+
+      - name: SSH into remote server and remove container if exists
+        run: |
+          ssh root@${{ secrets.SERVER_IP }} '
+            docker ps -a | grep backend-cm | awk '\''{print $1}'\'' | xargs docker rm || true
+          '
+        env:
+          SERVER_IP: ${{ secrets.SERVER_IP }}
+
+      - name: SSH into remote server and remove existing image if exists
+        run: |
+          ssh root@${{ secrets.SERVER_IP }} '
+            docker images -a | grep backend-cm | awk '\''{print $3}'\'' | xargs docker rmi -f || true
+          '
+        env:
+          SERVER_IP: ${{ secrets.SERVER_IP }}
 
       - name: Copy files to remote server
         run: scp -r ./* root@${{ secrets.SERVER_IP }}:/canchamanager
         env:
           SERVER_IP: ${{ secrets.SERVER_IP }}
 
+      - name: SSH into remote server and build Docker image
+        run: |
+          ssh root@${{ secrets.SERVER_IP }} '
+            cd /canchamanager
+            docker build -t backend-cm:latest .
+          '
+        env:
+          SERVER_IP: ${{ secrets.SERVER_IP }}
+
       - name: SSH into remote server and restart application
         run: |
-          ssh root@${SERVER_IP} 'cd /canchamanager && docker-compose down && docker-compose up -d'
+          ssh root@${{ secrets.SERVER_IP }} '
+            cd /canchamanager
+            docker-compose down
+            docker-compose up -d
+          '
         env:
           SERVER_IP: ${{ secrets.SERVER_IP }}

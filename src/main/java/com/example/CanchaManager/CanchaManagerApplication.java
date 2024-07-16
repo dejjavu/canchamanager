@@ -35,7 +35,7 @@ public class CanchaManagerApplication {
 		if (os.contains("win")) {
 			return "C:/application.properties";
 		} else if (os.contains("nix") || os.contains("nux") || os.contains("mac")) {
-			return "CanchaManager/src/main/resources/application.properties";
+			return "canchamanager/src/main/resources/application.properties";
 		}
 		throw new UnsupportedOperationException("Unsupported operating system: " + os);
 	}

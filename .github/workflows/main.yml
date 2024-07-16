@@ -23,9 +23,7 @@ jobs:
 
       - name: Build Docker image
         run: docker build -t backend-cm:latest .
-        working-directory: /canchamanager  # Reemplaza con la ruta correcta donde está tu Dockerfile
-
-
+        working-directory: ./  # Ajusta según la ubicación de tu Dockerfile dentro del repositorio
 
       - name: Copy files to remote server
         run: scp -r ./* root@${{ secrets.SERVER_IP }}:/canchamanager

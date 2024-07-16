@@ -1,6 +1,7 @@
 version: '3.8'
 services:
   backend-cm:
-    image: backend-cm
+    image: backend-cm:latest
     ports:
       - "8080:8080"
+

@@ -1,6 +1,6 @@
 version: '3.8'
 services:
   backend-cm:
-    image: canchamanager:latest
+    image: backend-cm
     ports:
       - "8080:8080"

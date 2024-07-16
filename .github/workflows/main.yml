@@ -15,21 +15,16 @@ jobs:
 
       - name: Add SSH key to known_hosts
         run: ssh-keyscan -t rsa ${SERVER_IP} >> ~/.ssh/known_hosts
+        env:
+          SERVER_IP: ${{ secrets.SERVER_IP }}
 
-        
-      - name: Configure SSH
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H -p 22 github.com >> ~/.ssh/known_hosts
-          ssh -v root@${{ secrets.SERVER_IP }} pwd  # Verifica la conexión SSH para depurar problemas de autenticación
+      - name: Copy files to remote server
+        run: scp -r ./* root@${SERVER_IP}:/canchamanager
+        env:
+          SERVER_IP: ${{ secrets.SERVER_IP }}
 
-      - name: Copy files to server
+      - name: SSH into remote server and restart application
         run: |
-          scp -r ./* root@${{ secrets.SERVER_IP }}:/canchamanager
-
-      - name: SSH into server and deploy Docker container
-        run: |
-          ssh -v root@${{ secrets.SERVER_IP }} 'cd /canchamanager && docker-compose down'
-          ssh -v root@${{ secrets.SERVER_IP }} 'cd /canchamanager && docker-compose up -d'
+          ssh root@${SERVER_IP} 'cd /canchamanager && docker-compose down && docker-compose up -d'
+        env:
+          SERVER_IP: ${{ secrets.SERVER_IP }}

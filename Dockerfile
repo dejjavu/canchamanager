@@ -4,7 +4,7 @@ FROM openjdk:17
 EXPOSE 8080
 
 # Definir directorio raíz de nuestro contenedor
-WORKDIR /CanchaManager
+WORKDIR /canchamanager
 
 # Copiar y pegar archivos dentro del contenedor
 COPY ./pom.xml ./pom.xml

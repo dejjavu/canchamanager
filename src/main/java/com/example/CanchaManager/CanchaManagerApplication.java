@@ -36,6 +36,6 @@ public class CanchaManagerApplication {
 		} else if (os.contains("nix") || os.contains("nux") || os.contains("mac")) {
 			return "/home/ignacio/Escritorio/canchamanager/src/main/resources/application.properties";
 		}
-		throw new UnsupportedOperationException("Unsupported operating system: " + os);
+		throw new UnsupportedOperationException("Unsupported operating: " + os);
 	}
 }

@@ -20,7 +20,7 @@ public class CanchaManagerApplication {
 
 		// Cargar el archivo de propiedades
 		Properties properties = new Properties();
-		try (FileInputStream fis = new FileInputStream(new File(applicationPropertiesPath))) {
+		try (FileInputStream fis = new FileInputStream(applicationPropertiesPath)){
 			properties.load(fis);
 		}
 
@@ -35,7 +35,7 @@ public class CanchaManagerApplication {
 		if (os.contains("win")) {
 			return "C:/application.properties";
 		} else if (os.contains("nix") || os.contains("nux") || os.contains("mac")) {
-			return "/canchamanager/src/main/resources/application.properties";
+			return "/home/ignacio/Escritorio/canchamanager/src/main/resources/application.properties";
 		}
 		throw new UnsupportedOperationException("Unsupported operating system: " + os);
 	}

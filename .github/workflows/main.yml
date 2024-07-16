@@ -1,4 +1,4 @@
-name: Docker Build and Deploy
+name: Deploy to Server
 
 on:
   push:
@@ -8,6 +8,7 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -15,28 +16,15 @@ jobs:
       - name: Configure SSH
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.GITHUB_SSH_KEY }}" > ~/.ssh/id_rsa
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H ${{ secrets.SERVER_IP }} >> ~/.ssh/known_hosts
 
-      - name: Check if container exists
+      - name: Copy files to server
         run: |
-          CONTAINER_EXISTS=$(ssh -v root@${{ secrets.SERVER_IP }} 'docker ps -aqf "name=canchamanager-app"')
-          echo "::set-output name=exists::${CONTAINER_EXISTS}"
+          scp -r ./* root@${{ secrets.SERVER_IP }}:/canchamanager
 
-      - name: Stop and remove existing Docker container
+      - name: SSH into server and deploy Docker container
         run: |
-          ssh -v root@${{ secrets.SERVER_IP }} 'docker stop canchamanager-app || true'
-          ssh -v root@${{ secrets.SERVER_IP }} 'docker rm canchamanager-app || true'
-
-      - name: Remove existing Docker image
-        run: |
-          ssh -v root@${{ secrets.SERVER_IP }} 'docker rmi canchamanager-app:latest || true'
-
-      - name: Send Docker image to Linux Server
-        run: |
-          docker save canchamanager-app:latest | ssh -v root@${{ secrets.SERVER_IP }} 'docker load'
-
-      - name: Restart Docker container
-        run: |
-          ssh -v root@${{ secrets.SERVER_IP }} 'docker run -d --name canchamanager-app -p 8080:8080 canchamanager-app:latest'
+          ssh -v root@${{ secrets.SERVER_IP }} 'cd /canchamanager && docker-compose down'
+          ssh -v root@${{ secrets.SERVER_IP }} 'cd /canchamanager && docker-compose up -d'

@@ -18,7 +18,7 @@ jobs:
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H -p 22 <GitHub_IP> >> ~/.ssh/known_hosts
+          ssh-keyscan -H -p 22 github.com >> ~/.ssh/known_hosts
           ssh -v root@${{ secrets.SERVER_IP }} pwd  # Verifica la conexión SSH para depurar problemas de autenticación
 
       - name: Copy files to server

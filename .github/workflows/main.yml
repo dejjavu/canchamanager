@@ -13,6 +13,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
+      - name: Add SSH key to known_hosts
+        run: ssh-keyscan -t rsa ${SERVER_IP} >> ~/.ssh/known_hosts
+
+        
       - name: Configure SSH
         run: |
           mkdir -p ~/.ssh

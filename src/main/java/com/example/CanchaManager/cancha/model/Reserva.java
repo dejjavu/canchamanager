@@ -26,7 +26,7 @@ public class Reserva {
     private LocalTime horaFin;
     private Double monto;
     private boolean pagado;
-    private boolean deshabilitada;
+    private Boolean deshabilitada;
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false) // Ajusta el nombre de la columna según tu esquema
@@ -112,11 +112,11 @@ public class Reserva {
         this.pagado = pagado;
     }
 
-    public boolean isDeshabilitada() {
-        return deshabilitada;
+    public Boolean getDeshabilitada() {
+        return deshabilitada != null ? deshabilitada : false;
     }
 
-    public void setDeshabilitada(boolean deshabilitada) {
+    public void setDeshabilitada(Boolean deshabilitada) {
         this.deshabilitada = deshabilitada;
     }
 

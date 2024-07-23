@@ -1,5 +1,6 @@
 package com.example.CanchaManager.cancha.service;
 import com.example.CanchaManager.caja.model.Precio;
+import com.example.CanchaManager.cancha.controller.HolidayService;
 import com.example.CanchaManager.cancha.model.Cancha;
 import com.example.CanchaManager.cancha.model.Reserva;
 import com.example.CanchaManager.cancha.model.ReservaDTO;
@@ -33,6 +34,8 @@ public class ReservaService {
 
     @Autowired
     private PrecioRepository precioRepository;
+@Autowired
+    private HolidayService holidayService;
 
     public List<ReservaDTO> getAllReservasDTO() {
         try {
@@ -62,15 +65,18 @@ public class ReservaService {
         try {
             Cancha cancha = reserva.getCancha();
 
-            // Verificar si la cancha está deshabilitada
-            if (!reserva.getCancha().isEstado()) {
-                // La cancha está habilitada, se puede proceder con la reserva
-            } else {
-                throw new ReservaException("Cancha deshabilitada, por favor seleccione una alternativa.");
-            }
+            // Verificar si la cancha está habilitada
+//            if (!cancha.isEstado()) {
+//                throw new ReservaException("Cancha deshabilitada, por favor seleccione una alternativa.");
+//            }
 
             LocalDate fechaReserva = reserva.getFechaReserva();
             LocalTime horaInicio = reserva.getHoraInicio();
+
+            // Verificar si la fecha es un feriado
+            if (holidayService.isHoliday(fechaReserva)) {
+                throw new ReservaException("No se pueden hacer reservas en días feriados.");
+            }
 
             // Verificar si ya existe una reserva para la misma cancha, fecha y hora de inicio
             if (reservaRepository.existsByCanchaAndFechaReservaAndHoraInicio(cancha, fechaReserva, horaInicio)) {

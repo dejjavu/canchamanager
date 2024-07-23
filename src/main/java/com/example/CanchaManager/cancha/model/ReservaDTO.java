@@ -36,7 +36,7 @@ public class ReservaDTO {
         this.pagado = reserva.isPagado();
         this.monto = reserva.getMonto();
         this.usuario = reserva.getUsuario().getUsername();
-        this.deshabilitada = reserva.isDeshabilitada();
+        this.deshabilitada = reserva.getDeshabilitada();
 
     }
 }

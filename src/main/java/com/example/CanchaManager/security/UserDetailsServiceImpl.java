@@ -1,8 +1,6 @@
 package com.example.CanchaManager.security;
 
 
-import com.example.CanchaManager.model.User;
-import com.example.CanchaManager.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

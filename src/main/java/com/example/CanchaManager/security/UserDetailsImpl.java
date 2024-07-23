@@ -1,6 +1,5 @@
 package com.example.CanchaManager.security;
 
-import com.example.CanchaManager.model.User;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;

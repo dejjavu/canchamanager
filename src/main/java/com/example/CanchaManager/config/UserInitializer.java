@@ -1,10 +1,10 @@
 package com.example.CanchaManager.config;
 
-import com.example.CanchaManager.model.ERole;
-import com.example.CanchaManager.model.Role;
-import com.example.CanchaManager.model.User;
-import com.example.CanchaManager.repository.RoleRepository;
-import com.example.CanchaManager.repository.UserRepository;
+import com.example.CanchaManager.security.ERole;
+import com.example.CanchaManager.security.Role;
+import com.example.CanchaManager.security.User;
+import com.example.CanchaManager.security.RoleRepository;
+import com.example.CanchaManager.security.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;

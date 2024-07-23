@@ -1,8 +1,8 @@
 package com.example.CanchaManager.config;
 
-import com.example.CanchaManager.model.ERole;
-import com.example.CanchaManager.model.Role;
-import com.example.CanchaManager.repository.RoleRepository;
+import com.example.CanchaManager.security.ERole;
+import com.example.CanchaManager.security.Role;
+import com.example.CanchaManager.security.RoleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;

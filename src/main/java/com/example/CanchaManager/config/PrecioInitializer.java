@@ -1,8 +1,7 @@
 package com.example.CanchaManager.config;
 
-import com.example.CanchaManager.model.Precio;
-import com.example.CanchaManager.model.tiposEnum;
-import com.example.CanchaManager.repository.PrecioRepository;
+import com.example.CanchaManager.caja.model.Precio;
+import com.example.CanchaManager.caja.repository.PrecioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;

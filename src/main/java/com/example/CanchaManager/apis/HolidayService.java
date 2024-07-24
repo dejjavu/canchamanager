@@ -1,6 +1,5 @@
-package com.example.CanchaManager.cancha.controller;
+package com.example.CanchaManager.apis;
 
-import com.example.CanchaManager.cancha.service.HolidayResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;

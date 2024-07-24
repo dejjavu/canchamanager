@@ -19,6 +19,31 @@ public class Mesa {
     @OneToMany(mappedBy = "mesa")
     private List<ProductoMesa> productos;
 
-    // getters y setters
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getNumero() {
+        return numero;
+    }
+
+    public void setNumero(String numero) {
+        this.numero = numero;
+    }
+
+    public List<ProductoMesa> getProductos() {
+        return productos;
+    }
+
+    public void setProductos(List<ProductoMesa> productos) {
+        this.productos = productos;
+    }
+
+
+// getters y setters
 
 }

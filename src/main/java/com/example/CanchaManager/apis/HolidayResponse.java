@@ -1,4 +1,4 @@
-package com.example.CanchaManager.cancha.service;
+package com.example.CanchaManager.apis;
 
 public class HolidayResponse {
     private String date;

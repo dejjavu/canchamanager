@@ -7,5 +7,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface CanchaRepository extends JpaRepository<Cancha, Long> {
 
+    Boolean existsByIdAndEstado(Long id, String estado);
 
 }

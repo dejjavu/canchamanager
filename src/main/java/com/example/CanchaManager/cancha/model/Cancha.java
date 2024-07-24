@@ -17,24 +17,13 @@ public class Cancha {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String nombre;
-    private boolean estado;
-
-    public void setEstado(boolean estado) {
-        this.estado = estado;
-    }
-
+    private String estado = "HABILITADA";
     @OneToMany(mappedBy = "cancha", cascade = CascadeType.ALL)
     @JsonIgnore
     private List<Reserva> reservas;
 
-    // Getters y setters omitidos para brevedad
-
     public Long getId() {
         return id;
-    }
-
-    public boolean isEstado() {
-        return estado;
     }
 
     public void setId(Long id) {
@@ -58,5 +47,11 @@ public class Cancha {
         this.reservas = reservas;
     }
 
+    public String getEstado() {
+        return estado;
+    }
 
+    public void setEstado(String estado) {
+        this.estado = estado;
+    }
 }

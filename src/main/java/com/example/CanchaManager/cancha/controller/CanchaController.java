@@ -45,12 +45,9 @@ public class CanchaController {
     public ResponseEntity<String> toggleEstadoCancha(@PathVariable Long id) {
         Cancha cancha = canchaService.cambiarEstadoCancha(id);
 
-        // Puedes devolver algún mensaje o información adicional si lo necesitas
-        String mensaje = "Estado de la cancha cambiado exitosamente a: " + (cancha.isEstado() ? "HABILITADA" : "DESHABILITADA");
-
+        // Mensaje sobre el nuevo estado
+        String mensaje = "Estado de la cancha cambiado exitosamente a: " + cancha.getEstado();
         return ResponseEntity.ok(mensaje);
     }
-
-
 
 }

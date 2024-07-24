@@ -23,7 +23,7 @@ import java.util.Optional;
 @Service
 public class CajaService {
 
-    private static final Logger log = LogManager.getLogger(CajaService.class);
+    public static final Logger log = LogManager.getLogger(CajaService.class);
     @Autowired
     CajaRepository cajaRepository;
     @Autowired

@@ -1,45 +1,26 @@
 package com.example.CanchaManager.caja.model;
 
-import com.example.CanchaManager.bar.model.Mesa;
-import com.example.CanchaManager.cancha.model.Reserva;
-import com.example.CanchaManager.security.User;
-import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.sql.Time;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
-@Entity
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class Transaccion {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+public class TransaccionDTO {
     private Long id;
     private Double monto;
     private LocalDate fecha;
-    private LocalTime hora;
-    private String tipo; // INGRESO, EGRESO
+    private Time hora;
+    private String tipo;
     private String descripcion;
     private String metodoIngreso;
+    private Long usuarioId;
+    private Long reservaId;
+    private Long mesaId;
 
-    @ManyToOne
-    @JoinColumn(name = "usuario_id", nullable = false)
-    private User usuario;
-
-    @ManyToOne
-    @JoinColumn(name = "reserva_id", nullable = true)
-    private Reserva reserva;
-
-    @ManyToOne
-    @JoinColumn(name = "mesa_id", nullable = true)
-    private Mesa mesa;
-
-    // Getters y Setters
     public Long getId() {
         return id;
     }
@@ -65,10 +46,10 @@ public class Transaccion {
     }
 
     public Time getHora() {
-        return Time.valueOf(hora);
+        return hora;
     }
 
-    public void setHora(LocalTime hora) {
+    public void setHora(Time hora) {
         this.hora = hora;
     }
 
@@ -96,27 +77,28 @@ public class Transaccion {
         this.metodoIngreso = metodoIngreso;
     }
 
-    public User getUsuario() {
-        return usuario;
+    public Long getUsuarioId() {
+        return usuarioId;
     }
 
-    public void setUsuario(User usuario) {
-        this.usuario = usuario;
+    public void setUsuarioId(Long usuarioId) {
+        this.usuarioId = usuarioId;
     }
 
-    public Reserva getReserva() {
-        return reserva;
+    public Long getReservaId() {
+        return reservaId;
     }
 
-    public void setReserva(Reserva reserva) {
-        this.reserva = reserva;
+    public void setReservaId(Long reservaId) {
+        this.reservaId = reservaId;
     }
 
-    public Mesa getMesa() {
-        return mesa;
+    public Long getMesaId() {
+        return mesaId;
     }
 
-    public void setMesa(Mesa mesa) {
-        this.mesa = mesa;
+    public void setMesaId(Long mesaId) {
+        this.mesaId = mesaId;
     }
+// Constructor, getters y setters
 }

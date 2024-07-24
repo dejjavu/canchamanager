@@ -26,7 +26,7 @@ public class Reserva {
     private LocalTime horaFin;
     private Double monto;
     private boolean pagado;
-    private Boolean deshabilitada;
+    private Boolean deshabilitada = false;
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false) // Ajusta el nombre de la columna según tu esquema

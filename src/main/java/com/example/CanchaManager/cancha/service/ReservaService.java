@@ -1,6 +1,7 @@
 package com.example.CanchaManager.cancha.service;
+
 import com.example.CanchaManager.caja.model.Precio;
-import com.example.CanchaManager.cancha.controller.HolidayService;
+import com.example.CanchaManager.apis.HolidayService;
 import com.example.CanchaManager.cancha.model.Cancha;
 import com.example.CanchaManager.cancha.model.Reserva;
 import com.example.CanchaManager.cancha.model.ReservaDTO;
@@ -34,11 +35,13 @@ public class ReservaService {
 
     @Autowired
     private PrecioRepository precioRepository;
-@Autowired
+
+    @Autowired
     private HolidayService holidayService;
 
     public List<ReservaDTO> getAllReservasDTO() {
         try {
+            logger.info("Obteniendo todas las reservas.");
             List<Reserva> reservas = reservaRepository.findAll();
             return reservas.stream().map(ReservaDTO::new).collect(Collectors.toList());
         } catch (Exception e) {
@@ -49,10 +52,12 @@ public class ReservaService {
 
     public ReservaDTO getReservaById(Long id) throws Exception {
         try {
+            logger.info("Obteniendo reserva con ID: {}", id);
             Optional<Reserva> reservaOptional = reservaRepository.findById(id);
             if (reservaOptional.isPresent()) {
                 return new ReservaDTO(reservaOptional.get());
             } else {
+                logger.warn("Reserva no encontrada con ID: {}", id);
                 throw new Exception("Reserva no encontrada con ID: " + id);
             }
         } catch (Exception e) {
@@ -63,23 +68,30 @@ public class ReservaService {
 
     public ReservaDTO createReserva(Reserva reserva) {
         try {
+            logger.info("Creando nueva reserva: {}", reserva);
             Cancha cancha = reserva.getCancha();
 
             // Verificar si la cancha está habilitada
-//            if (!cancha.isEstado()) {
-//                throw new ReservaException("Cancha deshabilitada, por favor seleccione una alternativa.");
-//            }
+            Cancha canchaExistente = canchaRepository.findById(cancha.getId())
+                    .orElseThrow(() -> new ReservaException("Cancha no encontrada."));
+
+            if ("DESHABILITADA".equals(canchaExistente.getEstado())) {
+                logger.warn("Cancha deshabilitada");
+                throw new ReservaException("La cancha está deshabilitada, no se puede hacer la reserva.");
+            }
 
             LocalDate fechaReserva = reserva.getFechaReserva();
             LocalTime horaInicio = reserva.getHoraInicio();
 
             // Verificar si la fecha es un feriado
             if (holidayService.isHoliday(fechaReserva)) {
+                logger.warn("La fecha de la reserva es un feriado: {}", fechaReserva);
                 throw new ReservaException("No se pueden hacer reservas en días feriados.");
             }
 
             // Verificar si ya existe una reserva para la misma cancha, fecha y hora de inicio
             if (reservaRepository.existsByCanchaAndFechaReservaAndHoraInicio(cancha, fechaReserva, horaInicio)) {
+                logger.warn("Ya existe una reserva para la cancha: {} en la fecha: {} y hora: {}", cancha, fechaReserva, horaInicio);
                 throw new ReservaException("La cancha ya tiene una reserva para el día y horario registrado.");
             }
 
@@ -89,11 +101,13 @@ public class ReservaService {
             if (precioOptional.isPresent()) {
                 reserva.setMonto(precioOptional.get().getMonto());
             } else {
+                logger.warn("No se encontró un precio válido para el tipo de reserva: {}", tipoPrecio);
                 throw new ReservaException("No se encontró un precio válido para el tipo de reserva.");
             }
 
             // Guardar la reserva en la base de datos
             Reserva savedReserva = reservaRepository.save(reserva);
+            logger.info("Reserva creada con éxito: {}", savedReserva);
             return new ReservaDTO(savedReserva);
         } catch (Exception e) {
             logger.error("Error al crear la reserva.", e);
@@ -101,14 +115,18 @@ public class ReservaService {
         }
     }
 
-
     public Reserva updateReserva(Long id, Reserva reserva) {
         try {
+            logger.info("Actualizando reserva con ID: {}", id);
             if (reservaRepository.existsById(id)) {
                 reserva.setId(id);
-                return reservaRepository.save(reserva);
+                Reserva updatedReserva = reservaRepository.save(reserva);
+                logger.info("Reserva actualizada con éxito: {}", updatedReserva);
+                return updatedReserva;
+            } else {
+                logger.warn("Reserva con ID: {} no encontrada para actualizar.", id);
+                return null;
             }
-            return null;
         } catch (Exception e) {
             logger.error("Error al actualizar la reserva con ID: " + id, e);
             throw e;
@@ -117,7 +135,9 @@ public class ReservaService {
 
     public boolean deleteReserva(Long id) {
         try {
+            logger.info("Eliminando reserva con ID: {}", id);
             reservaRepository.deleteById(id);
+            logger.info("Reserva con ID: {} eliminada con éxito.", id);
             return true;
         } catch (Exception e) {
             logger.error("Error al eliminar la reserva con ID: " + id, e);
@@ -135,6 +155,14 @@ public class ReservaService {
 
     @Transactional
     public List<Reserva> saveAll(List<Reserva> reservas) {
-        return reservaRepository.saveAll(reservas);
+        try {
+            logger.info("Guardando todas las reservas: {}", reservas);
+            List<Reserva> savedReservas = reservaRepository.saveAll(reservas);
+            logger.info("Reservas guardadas con éxito.");
+            return savedReservas;
+        } catch (Exception e) {
+            logger.error("Error al guardar todas las reservas.", e);
+            throw e;
+        }
     }
 }
